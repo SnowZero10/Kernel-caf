@@ -1,0 +1,518 @@
+#include "spi_panel_zte_lead_st7789v_ctc_2p8_qvga_cmd.dtsi"
+#include "spi_panel_zte_helitai_st7789v_hsd_2p8_qvga_cmd.dtsi"
+#include "spi_panel_zte_coe_st7789v_ivo_2p8_qvga_cmd.dtsi"
+&mdss_mdp {
+	qcom,mdss-pref-prim-intf = "spi";
+};
+
+&mdss_spi {
+	qcom,spi-pref-prim-pan = <&spi_st7789v_qvga_cmd>;
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_te_active>;
+	pinctrl-1 = <&mdss_te_suspend>;
+
+	qcom,platform-te-gpio = <&msm_gpio 24 0>;
+	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
+	qcom,platform-spi-dc-gpio = <&msm_gpio 110 0>;
+	qcom,platform-spi-power-enable-gpio = <&msm_gpio 12 0>;
+};
+
+&rpm_bus {
+	rpm-regulator-ldoa17 {
+		status = "okay";
+		pm8916_l17: regulator-l17 {
+			regulator-min-microvolt = <2850000>;
+			regulator-max-microvolt = <2850000>;
+			qcom,init-voltage = <2850000>;
+			status = "okay";
+		};
+	};
+	rpm-regulator-ldoa6 {
+		status = "okay";
+		pm8916_l6: regulator-l6 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+};
+
+&soc {
+		msm_gpio: pinctrl@1000000 {
+		compatible = "qcom,msm8909-pinctrl";
+		reg = <0x1000000 0x300000>;
+		interrupts = <0 208 0>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		spi5 {
+			spi5_default: spi5_default {
+				mux {
+					pins = "gpio16", "gpio17",
+						"gpio19";
+					function = "blsp_spi5";
+				};
+				config {
+					pins = "gpio16", "gpio17",
+						"gpio19";
+					drive-strength = <12>; /* 12 MA */
+					bias-disable; /* No PULL */
+				};
+			};
+			spi5_sleep: spi5_sleep {
+				mux {
+					pins = "gpio16", "gpio17",
+						"gpio19";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio16", "gpio17",
+						"gpio19";
+					drive-strength = <2>; /* 2 MA */
+					bias-pull-down; /* pull down */
+				};
+			};
+			spi5_cs0_active: spi5_cs0_active {
+				mux {
+					pins = "gpio18";
+					function = "blsp_spi5";
+				};
+				config {
+					pins = "gpio18";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+			};
+			spi5_cs0_sleep: spi5_cs0_sleep {
+				mux {
+					pins = "gpio18";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio18";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		spi6 {
+			spi6_default: spi6_default {
+				mux {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					function = "blsp_spi6";
+				};
+				config {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					drive-strength = <12>; /* 12 MA */
+					bias-disable; /* No PULL */
+				};
+			};
+			spi6_sleep: spi6_sleep {
+				mux {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					drive-strength = <2>; /* 2 MA */
+					bias-pull-down; /* pull down */
+				};
+			};
+			spi6_cs0_active: spi6_cs0_active {
+				mux {
+					pins = "gpio10";
+					function = "blsp_spi6";
+				};
+				config {
+					pins = "gpio10";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+			spi6_cs0_sleep: spi6_cs0_sleep {
+				mux {
+					pins = "gpio10";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio10";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+		};
+
+		second_panel_dc {
+			second_panel_dc_high: second_panel_dc_high {
+				mux {
+					pins = "gpio36";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio36";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_dc_low: second_panel_dc_low {
+				mux {
+					pins = "gpio36";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio36";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+
+		second_panel_rst{
+			second_panel_rst_high: second_panel_rst_high {
+				mux {
+					pins = "gpio33";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio33";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_rst_low: second_panel_rst_low {
+				mux {
+					pins = "gpio33";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio33";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+
+		second_panel_vddio {
+			second_panel_vddio_high: second_panel_vddio_high {
+				mux {
+					pins = "gpio12";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio12";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_vddio_low: second_panel_vddio_low {
+				mux {
+					pins = "gpio12";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio12";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+		/* sensors */
+		cam_sensor_mclk0_default: cam_sensor_mclk0_default {
+			/* MCLK0 */
+			mux {
+				/* CLK, DATA */
+				pins = "gpio26";
+				function = "cam_mclk";
+			};
+
+			config {
+				pins = "gpio26";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+
+		cam_sensor_mclk0_sleep: cam_sensor_mclk0_sleep {
+			/* MCLK0 */
+			mux {
+				/* CLK, DATA */
+				pins = "gpio26";
+				function = "cam_mclk";
+			};
+
+			config {
+				pins = "gpio26";
+				bias-pull-down; /* PULL DOWN */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+		cam_sensor_rear_default: cam_sensor_rear_default { //caidd modify for Z2321A_O cam
+			/* RESET, STANDBY */
+			mux {
+				pins = "gpio35","gpio34","gpio99","gpio6";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio35","gpio34","gpio99","gpio6";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+		cam_sensor_rear_sleep: cam_sensor_rear_sleep {  //caidd modify for Z2321A_O cam
+			/* RESET, STANDBY */
+			mux {
+				pins = "gpio35","gpio34","gpio99","gpio6";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio35","gpio34","gpio99","gpio6";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+		pmx_i2c_1 {
+			i2c_1_active: i2c_1_active {
+				mux {
+					pins = "gpio7";
+					function = "blsp_i2c1";
+				};
+				config {
+					pins = "gpio7";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+			i2c_1_sleep: i2c_1_sleep {
+				mux {
+					pins = "gpio7";
+					function = "blsp_i2c1";
+				};
+				config {
+					pins = "gpio7";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+		};
+		tlmm_gpio_key {
+			gpio_key_active: gpio_key_active {
+				mux {
+					pins = "gpio90", "gpio91", "gpio92", "gpio28", "gpio95",
+							"gpio96", "gpio98", "gpio111", "gpio112";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio90", "gpio91", "gpio92", "gpio28", "gpio95",
+							"gpio96", "gpio98", "gpio111", "gpio112";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+		};
+
+			gpio_key_suspend: gpio_key_suspend {
+				mux {
+					pins = "gpio90", "gpio91", "gpio92";
+					function = "gpio";
+				};
+
+					config {
+					pins = "gpio90", "gpio91", "gpio92";
+					drive-strength = <2>;
+					bias-pull-up;
+				};
+			};
+		};
+	};
+
+	 i2c_5: i2c@78b9000 { /* BLSP1 QUP5 */
+		status = "disabled";
+	};
+
+	spi_5: spi@78B9000{/* BLSP1 QUP5 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x78b9000 0x600>,
+		      <0x7884000 0x23000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 99 0>, <0 238 0>;
+		spi-max-frequency = <50000000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi5_default &spi5_cs0_active>;
+		pinctrl-1 = <&spi5_sleep &spi5_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
+		<&clock_gcc clk_gcc_blsp1_qup5_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,infinite-mode = <0>;
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <12>;
+		qcom,bam-producer-pipe-index = <13>;
+		qcom,master-id = <86>;
+		status = "okay";
+		qcom,mdss_spi_client {
+			reg = <0>;
+			compatible = "qcom,mdss-spi-client";
+			label = "MDSS SPI QUP5 CLIENT";
+			spi-max-frequency = <50000000>;
+		};
+	};
+	matrix_keypad: matrix_keypad@0 {
+			compatible = "gpio-matrix-keypad";
+			debounce-delay-ms = <15>;
+			col-scan-delay-us = <2>;
+			gpio-activelow;
+			row-gpios = <&msm_gpio 95 0x0
+					&msm_gpio 96 0x0
+					&msm_gpio 98 0x0
+					&msm_gpio 111 0x0
+					&msm_gpio 112 0x0
+					&msm_gpio 28 0x0>;
+			col-gpios = <&msm_gpio 2  0x0
+					&msm_gpio 3 0x0
+					&msm_gpio 27 0x0
+					&msm_gpio 32 0x0>;
+			linux,keymap = <0x000000E4 0x0001000A 0x00020007 0x00030004
+					0x0100000B 0x01010009 0x01020006 0x01030003
+					0x020000E3 0x02010008 0x02020005 0x02030002
+					0x0300000E 0x030100D4 0x03020244 0x030300A9
+					0x0400006C 0x04010069 0x04020064 0x0403006A
+					0x05000067 0x05010038 0x0502001C  >;
+		};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		input-name = "gpio-keys";
+		pinctrl-names = "tlmm_gpio_key_active","tlmm_gpio_key_suspend";
+		pinctrl-0 = <&gpio_key_active>;
+		pinctrl-1 = <&gpio_key_suspend>;
+
+		vol_down {
+			label = "volume_down";
+			gpios = <&msm_gpio 91 0x1>;
+			linux,input-type = <1>;
+			linux,code = <114>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+		vol_up {
+			label = "volume_up";
+			gpios = <&msm_gpio 90 0x1>;
+			linux,input-type = <1>;
+			linux,code = <115>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+	};
+	/*added by zte_pm for hall*/
+	hall_sensor {
+		compatible = "ah,hall_ic";
+		ah,gpio_irq = <&msm_gpio 58 0x0>;
+		linux,name = "hall_sensor";
+	};
+	/*end*/
+
+	/*zte_pm add for button light*/
+	gpio-leds {
+		compatible = "gpio-leds";
+		keypad-backlight {
+			gpios = <&msm_gpio 97 0>;
+			label = "button-backlight";
+			linux,default-trigger = "none";
+		};
+	};
+	/*end*/
+
+	spi_6: spi@78ba000 { /* BLSP1 QUP6 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x78ba000 0x600>,
+		      <0x7884000 0x23000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 100 0>, <0 238 0>;
+		spi-max-frequency = <4800000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi6_default &spi6_cs0_active>;
+		pinctrl-1 = <&spi6_sleep &spi6_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
+		<&clock_gcc clk_gcc_blsp1_qup6_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,infinite-mode = <0>;
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <14>;
+		qcom,bam-producer-pipe-index = <15>;
+		qcom,master-id = <86>;
+		status = "okay";
+		second_panel_spi {
+			reg = <0>;
+			compatible = "qcom,mdss-spi-second-panel";
+			label = "MDSS SPI QUP6 CLIENT";
+			spi-max-frequency = <4800000>;
+
+			pinctrl-names = "second_panel_dc_high", "second_panel_dc_low", "second_panel_rst_high",
+					"second_panel_rst_low", "second_panel_vddio_high", "second_panel_vddio_low";
+			pinctrl-0 = <&second_panel_dc_high>;
+			pinctrl-1 = <&second_panel_dc_low>;
+			pinctrl-2 = <&second_panel_rst_high>;
+			pinctrl-3 = <&second_panel_rst_low>;
+			pinctrl-4 = <&second_panel_vddio_high>;
+			pinctrl-5 = <&second_panel_vddio_low>;
+			vddio-supply = <&pm8916_l6>;	/*1.8v*/
+			vdd-supply = <&pm8916_l17>;	/*2.8v*/
+
+		};
+	};
+};
+
+&spmi_bus {
+	qcom,pm8909@0 {
+
+		qcom,leds@a300 {
+			status = "okay";
+			qcom,led_mpp_4 {
+				label = "mpp";
+				linux,name = "second_spi-backlight";
+				linux,default-trigger = "none";
+				qcom,default-state = "off";
+				qcom,max-current = <40>;
+				qcom,current-setting = <40>;
+				qcom,id = <6>;
+				qcom,mode = "manual";
+				qcom,source-sel = <1>;
+				qcom,mode-ctrl = <0x60>;
+			};
+		};
+	};
+};
+
+&sdhc_2 {
+	/delete-property/ cd-gpios;
+};
+
+&audio_codec_mtp {
+	qcom,msm-spk-ext-boost = <&msm_gpio 0 0>;
+};

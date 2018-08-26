@@ -1,0 +1,271 @@
+#include "zte-vinus-dsi-panel-ili9881c-dijing-s10-720p-video.dtsi"
+#include "zte-vinus-dsi-panel-ili9881c-holitech-720p-video.dtsi"
+#include "zte-vinus-dsi-panel-ili9881c-skyworth-720p-video.dtsi"
+#include "zte-vinus-dsi-panel-ili9881c-yashi-720p-video.dtsi"
+#include "touch-key-backlight-vinus.dtsi"
+&soc {
+	i2c@78b8000 { /* BLSP1 QUP4 */
+		smb1357-charger@57 {
+				status = "disabled";
+		};
+		smb358-charger@57 {
+				status = "disabled";
+		};
+	};
+	/*ZTE_MODIFY, add leds gpio conrol, start*/
+	gpio-modem-leds {
+		compatible = "gpio-modem-leds";
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_led_off>;
+
+		red-backlight {
+			gpios = <&msm_gpio 0 0>;
+			label = "red";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+		green-backlight {
+			gpios = <&msm_gpio 1 0>;
+			label = "green";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+		trickle-red-backlight {
+			gpios = <&msm_gpio 3 1>; /*active low*/
+			label = "trickle_red";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+	};
+	/*ZTE_MODIFY, add leds gpio conrol, end*/
+};
+
+&spmi_bus {
+	qcom,pm8909@0 {
+		qcom,vmbms {
+			status = "disabled";
+		};
+		qcom,charger {
+			status = "disabled";
+		};
+	};
+};
+
+&i2c_4 {
+	smb1360_otg_supply: smb1360-chg-fg@14 {
+		compatible = "qcom,smb1360-chg-fg";
+		reg = <0x14>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <58 8>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		/* qcom,charging-disabled; */
+		qcom,empty-soc-disabled;
+		qcom,chg-inhibit-disabled;
+		qcom,float-voltage-mv = <4400>;
+		qcom,fg-cc-to-cv-mv = <4390>;
+		qcom,iterm-ma = <150>;
+		qcom,fg-ibatt-standby-ma = <200>;
+		qcom,recharge-thresh-mv = <150>;
+		qcom,thermal-mitigation = <1500 700 450 0>;
+		regulator-name = "smb1360_otg_vreg";
+		qcom,thermistor-c1-coeff = <0x85EC>;
+		qcom,batt-id-disabled;
+		qcom,shdn-after-pwroff;
+		qcom,otg-batt-curr-limit = <1500>;
+		qcom,fg-delta-soc = <1>;
+		qcom,fg-auto-recharge-soc = <97>;
+		qcom,charging-timeout = <1536>;
+		qcom,fg-soc-min = <15>;
+		qcom,fg-soc-max = <95>;
+		qcom,fg-iterm-ma = <150>;
+		qcom,fg-cutoff-voltage-mv = <3400>;
+		qcom,fg-voltage-empty-mv = <3300>;
+		qcom,fg-batt-capacity-mah = <2400>;
+		qcom,fg-cc-soc-coeff = <0x82D4>;
+		/*JEITA*/
+		qcom,otp-jeita-hard;
+		qcom,config-hard-thresholds;
+		qcom,hot-bat-decidegc = <550>;
+		qcom,warm-bat-decidegc = <450>;
+		qcom,cool-bat-decidegc = <150>;
+		qcom,cold-bat-decidegc = <10>;
+		qcom,soft-jeita-supported;
+		qcom,warm-bat-mv = <4100>;
+		qcom,cool-bat-mv = <4400>;
+		qcom,warm-bat-ma = <450>;
+		qcom,cool-bat-ma = <600>;
+		qcom,disable-ov-ends-chg-cycle;
+		/*qcom,rsense-10mhom;*/
+		qcom,fg-reset-at-pon;
+		qcom,fg-reset-thresold-mv = <100>;
+	};
+};
+
+&msm_gpio {
+	ltr559_int_pin {
+		ltr559_default: ltr559_default {
+			mux {
+				pins = "gpio94";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio94";
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+		ltr559_sleep: ltr559_sleep {
+			mux {
+				pins = "gpio94";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio94";
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+	};
+};
+
+&i2c_1 { /* BLSP1 QUP1 */
+
+	/delete-node/ mpu6050@68;
+
+	bmi160@68 { /* lijiangshuo add for bmi160 */
+		compatible = "bosch,bmi160";
+		reg = <0x68>;
+		interrupt-parent = <&msm_gpio>;
+		vdd-supply = <&pm8909_l17>;
+		vio-supply = <&pm8909_l6>;
+		bosch,init-interval = <200>;
+		bosch,place	 = <6>;
+		};
+
+	lsm6ds3@6a { /* lijiangshuo add for lsm6ds3 */
+		compatible = "st,lsm6ds3";
+		reg = <0x6a>;
+		interrupt-parent = <&msm_gpio>;
+		vdd-supply = <&pm8909_l17>;
+		vio-supply = <&pm8909_l6>;
+		st,axis-map-x = <1>;
+		st,axis-map-y = <0>;
+		st,axis-map-z = <2>;
+		//st,negate-x;
+		//st,negate-y;
+		st,negate-z;
+	};
+
+	liteon@23 {
+		compatible = "liteon,ltr559";
+		reg = <0x23>;
+		pinctrl-names = "lpsensor_default","lpsensor_sleep";
+		pinctrl-0 = <&ltr559_default>;
+		pinctrl-1 = <&ltr559_sleep>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <94 0x2002>;
+		vdd-supply = <&pm8909_l17>;
+		vio-supply = <&pm8909_l6>;
+		liteon,irq-gpio = <&msm_gpio 94 0x2002>;
+		liteon,highthr = <300>;
+		liteon,lowthr = <200>;
+		liteon,power_on_max_ct = <720>;
+		liteon,ps_3cm_delta = <90>;
+		liteon,ps_5cm_delta = <40>;
+	};
+};
+
+&pm8909_chg {
+	status = "ok";
+	qcom,use-external-charger;
+};
+
+&pm8909_bms {
+	status = "ok";
+	qcom,disable-bms;
+};
+
+&usb_otg {
+	interrupts = <0 134 0>,<0 140 0>,<0 136 0>;
+	interrupt-names = "core_irq", "async_irq", "phy_irq";
+
+	qcom,hsusb-otg-mode = <3>;
+	vbus_otg-supply = <&smb1360_otg_supply>;
+};
+
+/* added by zte_fangjun for color_led,start */
+&msm_gpio {
+	gpio_led_pins {
+		gpio_led_off: gpio_led_off {
+			mux {
+				pins = "gpio0", "gpio1", "gpio3";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio0", "gpio1", "gpio3";
+				drive-strength = <2>;
+				bias-disable;
+				output-low;
+			};
+		};
+	};
+
+	sdhc2_cd_pin {
+		sdc2_cd_on: cd_on {
+			mux {
+				pins = "gpio38";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio38";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+		sdc2_cd_off: cd_off {
+			mux {
+				pins = "gpio38";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio38";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+/* added by zte_fangjun for color_led,end */
+
+
+/* added by zte_zhangzhao for sdcard,start */
+&sdhc_2 {
+	#address-cells = <0>;
+	interrupt-parent = <&sdhc_2>;
+	interrupts = <0 1 2>;
+	#interrupt-cells = <1>;
+	interrupt-map-mask = <0xffffffff>;
+	interrupt-map = <0 &intc 0 125 0
+					1 &intc 0 221 0
+					2 &msm_gpio 38 0>;
+	interrupt-names = "hc_irq", "pwr_irq", "status_irq";
+	cd-gpios = <&msm_gpio 38 0x0>;
+
+	vdd-supply = <&pm8909_l11>;
+	qcom,vdd-always-on;
+	qcom,vdd-voltage-level = <1800000 2950000>;
+	qcom,vdd-current-level = <15000 400000>;
+
+	vdd-io-supply = <&pm8909_l12>;
+	qcom,vdd-io-always-on;
+	qcom,vdd-io-voltage-level = <1800000 2950000>;
+	qcom,vdd-io-current-level = <200 50000>;
+
+	pinctrl-names = "active", "sleep";
+	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on>;
+	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
+	status = "ok";
+};

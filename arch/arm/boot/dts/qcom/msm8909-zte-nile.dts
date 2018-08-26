@@ -1,0 +1,126 @@
+/* Copyright (c) 2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "msm8909-mtp.dtsi"
+#include "msm8909-pm8909.dtsi"
+#include "msm8909-pm8909-mtp.dtsi"
+#include "zte-msm8909-nile.dtsi"
+
+#include "dsi-panel-ili9806e-fwvga-video.dtsi"
+#include "dsi-panel-zte-skyworth-hsd-ili9806e-fwvga-video.dtsi"
+#include "dsi-panel-zte-skyworth-ili9806e-cpt-5p0-fwvga-video.dtsi"
+#include "dsi-panel-zte-helitai-hsd-jd9161-fwvga-video.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8909-PM8909 512MB MTP";
+	compatible = "qcom,msm8909-mtp", "qcom,msm8909", "qcom,mtp";
+	qcom,board-id= <8 0x168>;
+};
+
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,rpull-up-kohm = <0>;
+		qcom,vref-batt-therm = <1800000>;
+
+		#include "batterydata-qrd-skut-4v35-2300mah.dtsi"
+	};
+};
+&dsi_ili9806e_fwvga_video {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_skyworth_ili9806e_hsd_fwvga_video {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_skyworth_ili9806e_fwvga_video {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_hlt_jd9161_fwvga_video {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&soc {
+	zte_misc {
+		compatible = "zte-misc";
+		/*zte,use-ti-charger-internal-battery-switch;*/
+		hw_ver_id_0 {
+			label = "hw_ver_id_0";
+		};
+		hw_ver_id_1 {
+			label = "hw_ver_id_1";
+		};
+	};
+};
+
+&pm8909_pon {
+	zte,pwrkey-det-gpio = <&msm_gpio 21 0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwrkey_det_active>;
+};
+
+
+&ti2419x_chg {
+	zte,float-voltage-mv = <4400>;
+	zte,iterm-ma = <128>;
+	/*zte,hw-iterm-disabled;*/ /*this var can not open here,should be opend by project dts*/
+	/*zte,charging-disabled;*/ /*this var can not open here,should be opend by project dts*/
+	zte,recharge-thresh-mv = <100>;
+	zte,warm_recharge-thresh-mv = <50>;
+	zte,vbatdet-max-err-mv = <20>;
+	zte,charging-timeout = <12>;
+	zte,input_voltage_mv = <4520>;
+	zte,max_usb_current = <2000>;
+	zte,max_usb_current_ti25601 = <2000>;
+	zte,max_battery_current = <2300>;
+	zte,thermal-mitigation = <1500 1000 900 500 0>;
+	zte,warm_bat_mv = <4000>;
+	zte,cool_bat_mv = <4400>;
+	zte,warm-bat-decidegc = <450>;
+	zte,cool-bat-decidegc = <100>;
+	zte,hot-bat-decidegc = <450>;
+	zte,cold-bat-decidegc = <20>;
+	zte,warm_bat_chg_ma = <1150>;
+	zte,cool_bat_chg_ma = <840>;
+	zte,batt-hot-percentage = <25>; /*for battery therm correcting*/
+	zte,batt-cold-percentage= <80>;
+};
+&pm8909_bms{
+	status = "ok";
+	qcom,battery-data = <&qrd_batterydata>;
+
+	qcom,v-cutoff-uv = <3400000>;
+	qcom,max-voltage-uv = <4440000>;
+	qcom,r-conn-mohm = <16>;
+	qcom,shutdown-soc-valid-limit = <100>;
+	qcom,low-soc-calculate-soc-threshold = <15>;
+	qcom,low-voltage-calculate-soc-ms = <1000>;
+	qcom,low-soc-calculate-soc-ms = <5000>;
+	qcom,calculate-soc-ms = <20000>;
+	qcom,volatge-soc-timeout-ms = <60000>;
+	qcom,low-voltage-threshold = <3450000>;
+	qcom,s3-ocv-tolerence-uv = <1200>;
+	qcom,s2-fifo-length = <5>;
+	qcom,low-soc-fifo-length = <2>;
+
+	qcom,force-s3-on-suspend;
+	qcom,force-s2-in-charging;
+	qcom,report-charger-eoc;
+	qcom,resume-soc = <96>;
+	qcom,use-reported-soc;
+};

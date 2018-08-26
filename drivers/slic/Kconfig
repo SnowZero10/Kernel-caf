@@ -1,0 +1,43 @@
+config SLIC
+	tristate "slic driver module support"
+	default n
+
+config SLIC_DEBUG
+	bool "ProSLIC debug support"
+	depends on SLIC
+	default n
+
+config PROSLIC
+	bool "ProSLIC devices support"
+	depends on SLIC && SPI
+	default n
+
+config PROSLIC_SI3217X
+	tristate "ProSLIC Si3217x support"
+	select PROSLIC
+	default n
+
+config PROSLIC_SI3210
+	tristate "ProSLIC Si3210 support"
+	select PROSLIC
+	default n
+
+config PROSLIC_RST_LOW
+	bool "ProSLIC RST is active low"
+	depends on PROSLIC
+	default n
+
+config SLIC_POLL_DTMF
+	bool "Polling to detect DTMF"
+	depends on SLIC
+	default n
+
+config SLIC_IRQ_TRIG_LOW
+	bool "INT Low level trigger irq"
+	depends on SLIC
+	default n
+
+config SLIC_IRQ_POLL
+	bool "Polling to correct irq fault"
+	depends on SLIC
+	default n

@@ -1,0 +1,391 @@
+#include "spi_panel_zte_lead_st7789v_ctc_2p8_qvga_cmd.dtsi"
+#include "touch-key-backlight-lena.dtsi"
+
+&mdss_mdp {
+	qcom,mdss-pref-prim-intf = "spi";
+};
+
+&mdss_spi {
+	qcom,spi-pref-prim-pan = <&spi_st7789v_qvga_cmd>;
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_te_active>;
+	pinctrl-1 = <&mdss_te_suspend>;
+
+	qcom,platform-te-gpio = <&msm_gpio 24 0>;
+	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
+	qcom,platform-spi-dc-gpio = <&msm_gpio 110 0>;
+	qcom,platform-spi-power-enable-gpio = <&msm_gpio 12 0>;
+};
+
+&rpm_bus {
+	rpm-regulator-ldoa17 {
+		status = "okay";
+		pm8916_l17: regulator-l17 {
+			regulator-min-microvolt = <2850000>;
+			regulator-max-microvolt = <2850000>;
+			qcom,init-voltage = <2850000>;
+			status = "okay";
+		};
+	};
+};
+
+&soc {
+		msm_gpio: pinctrl@1000000 {
+		compatible = "qcom,msm8909-pinctrl";
+		reg = <0x1000000 0x300000>;
+		interrupts = <0 208 0>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		pmx_mdss_reset {
+			mdss_reset_active: mdss_reset_active {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					drive-strength = <2>; /* 2mA */
+					bias-disable = <0>; /* no pull */
+					output-high;
+				};
+			};
+
+			mdss_reset_suspend: mdss_reset_suspend {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					drive-strength = <2>; /* 2 mA */
+					bias-disable = <0>; /* no pull */
+					output-high;
+				};
+			};
+		};
+		spi6 {
+			spi6_default: spi6_default {
+				mux {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					function = "blsp_spi6";
+				};
+				config {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					drive-strength = <12>; /* 12 MA */
+					bias-disable; /* No PULL */
+				};
+			};
+			spi6_sleep: spi6_sleep {
+				mux {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio8", "gpio9",
+						"gpio11";
+					drive-strength = <2>; /* 2 MA */
+					bias-pull-down; /* pull down */
+				};
+			};
+			spi6_cs0_active: spi6_cs0_active {
+				mux {
+					pins = "gpio10";
+					function = "blsp_spi6";
+				};
+				config {
+					pins = "gpio10";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+			spi6_cs0_sleep: spi6_cs0_sleep {
+				mux {
+					pins = "gpio10";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio10";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+		};
+
+		second_panel_dc {
+			second_panel_dc_high: second_panel_dc_high {
+				mux {
+					pins = "gpio36";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio36";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_dc_low: second_panel_dc_low {
+				mux {
+					pins = "gpio36";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio36";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+
+		second_panel_rst{
+			second_panel_rst_high: second_panel_rst_high {
+				mux {
+					pins = "gpio33";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio33";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_rst_low: second_panel_rst_low {
+				mux {
+					pins = "gpio33";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio33";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+
+		second_panel_vddio {
+			second_panel_vddio_high: second_panel_vddio_high {
+				mux {
+					pins = "gpio12";
+					function = "gpio";
+					output-high;
+				};
+				configs {
+					pins = "gpio12";
+					drive-strength = <8>;
+					bias-disable;
+				};
+			};
+
+			second_panel_vddio_low: second_panel_vddio_low {
+				mux {
+					pins = "gpio12";
+					function = "gpio";
+				};
+				configs {
+					pins = "gpio12";
+					drive-strength = <2>;
+					bias-disable;
+					output-low;
+				};
+			};
+		};
+	};
+
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		input-name = "gpio-keys";
+		pinctrl-names = "tlmm_gpio_key_active","tlmm_gpio_key_suspend";
+		pinctrl-0 = <&gpio_key_active>;
+		pinctrl-1 = <&gpio_key_suspend>;
+
+		vol_down {
+			label = "volume_down";
+			gpios = <&msm_gpio 91 0x1>;
+			linux,input-type = <1>;
+			linux,code = <114>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+		vol_up {
+			label = "volume_up";
+			gpios = <&msm_gpio 90 0x1>;
+			linux,input-type = <1>;
+			linux,code = <115>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+	};
+/*added by zte_pm for hall*/
+	hall_sensor {
+		compatible = "ah,hall_ic";
+		ah,gpio_irq = <&msm_gpio 58 0x0>;
+		linux,name = "hall_sensor";
+	};
+/*end*/
+	spi_6: spi@78ba000 { /* BLSP1 QUP6 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x78ba000 0x600>,
+		      <0x7884000 0x23000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 100 0>, <0 238 0>;
+		spi-max-frequency = <19200000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi6_default &spi6_cs0_active>;
+		pinctrl-1 = <&spi6_sleep &spi6_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
+		<&clock_gcc clk_gcc_blsp1_qup6_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,infinite-mode = <0>;
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <14>;
+		qcom,bam-producer-pipe-index = <15>;
+		qcom,master-id = <86>;
+		status = "okay";
+		second_panel_spi {
+			reg = <0>;
+			compatible = "qcom,mdss-spi-second-panel";
+			label = "MDSS SPI QUP6 CLIENT";
+			spi-max-frequency = <19200000>;
+
+			pinctrl-names = "second_panel_dc_high", "second_panel_dc_low", "second_panel_rst_high",
+					"second_panel_rst_low", "second_panel_vddio_high", "second_panel_vddio_low";
+			pinctrl-0 = <&second_panel_dc_high>;
+			pinctrl-1 = <&second_panel_dc_low>;
+			pinctrl-2 = <&second_panel_rst_high>;
+			pinctrl-3 = <&second_panel_rst_low>;
+			pinctrl-4 = <&second_panel_vddio_high>;
+			pinctrl-5 = <&second_panel_vddio_low>;
+			vdd-supply = <&pm8916_l17>;	/*2.8v*/
+
+		};
+	};
+
+	i2c@78b5000 { /* BLSP1 QUP1 */
+		bosch@18 { /* Accelerometer sensor */
+			compatible = "bosch,bma2x2";
+			reg = <0x18>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&accsensor_default>;
+			pinctrl-1 = <&accsensor_sleep>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <96 0x2002>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			bosch,init-interval = <200>;
+			bosch,place = <5>;
+			bosch,gpio-int1 = <&msm_gpio 96 0x2002>;
+			bosch,gpio-int2 = <&msm_gpio 65 0x2002>;
+		};
+
+		kxtj2@e {
+			compatible = "kionix,kxtj2-1029";
+			reg = <0x0e>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&accsensor_default>;
+			pinctrl-1 = <&accsensor_sleep>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <96 0x2>;
+			vddhold-supply = <&pm8909_l17>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			kionix,gpio-int = <&msm_gpio 96 0x2>;
+			kionix,min_interval = <5>;
+			kionix,poll_interval = <100>;
+			kionix,accel_direction = <5>;
+			kionix,accel_irq_use_drdy = <0>;
+			/*0 is 12BIT,	1 is 8BIT,	2 is 6BIT*/
+			kionix,accel_res = <0>;
+			/*0 is 2g,	1 is 4g,	2 is 6g,	3 is 8g*/
+			kionix,accel_g_range =	<0>;
+		};
+
+		n2dm@8 {
+			compatible = "st,n2dm";
+			reg = <0x08>;
+			interrupt-parent = <&msm_gpio>;
+			/*interrupts = <96 0x2>;*/
+			vddhold-supply = <&pm8909_l17>;
+			vdd-supply = <&pm8909_l17>;
+			vddio-supply = <&pm8909_l6>;
+			n2dm,min_interval = <1>;
+			n2dm,poll_interval = <100>;
+			n2dm,axis-map-x = <1>;
+			n2dm,axis-map-y = <0>;
+			n2dm,axis-map-z = <2>;
+			n2dm,negate-x;
+			n2dm,negate-y;
+			n2dm,negate-z;
+			/*0 is 2g,	16 is 4g,	32 is 8g,	48 is 16g*/
+			n2dm,fs-range = <0>;
+		};
+
+		ltr559@23 {
+			compatible = "liteon,ltr559";
+			reg = <0x23>;
+			pinctrl-names = "lpsensor_default", "lpsensor_sleep";
+			pinctrl-0 = <&lpsensor_default>;
+			pinctrl-1 = <&lpsensor_sleep>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <94 0x2002>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			liteon,irq-gpio = <&msm_gpio 94 0x2002>;
+			liteon,highthr = <1500>;
+			liteon,lowthr = <1200>;
+		};
+	};
+
+};
+
+&spmi_bus {
+	qcom,pm8909@0 {
+
+		qcom,leds@a300 {
+			status = "okay";
+			qcom,led_mpp_4 {
+				label = "mpp";
+				linux,name = "second_spi-backlight";
+				linux,default-trigger = "none";
+				qcom,default-state = "off";
+				qcom,max-current = <40>;
+				qcom,current-setting = <40>;
+				qcom,id = <6>;
+				qcom,mode = "manual";
+				qcom,source-sel = <1>;
+				qcom,mode-ctrl = <0x60>;
+			};
+		};
+	};
+};
+
+&sdhc_2 {
+	/delete-property/ cd-gpios;
+};
+
+&audio_codec_mtp {
+	qcom,msm-spk-ext-boost = <&msm_gpio 36 0>;
+};
+&mdss_dsi0 {
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_reset_active &mdss_te_active &mdss_reset_active>;
+	pinctrl-1 = <&mdss_reset_suspend &mdss_te_suspend  &mdss_reset_suspend>;
+
+	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
+	qcom,platform-bklight-en-gpio = <&msm_gpio 37 0>;
+};

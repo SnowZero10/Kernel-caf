@@ -1,0 +1,63 @@
+/* Copyright (c) 2014, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+&mdss_mdp {
+	spi_coe_st7789v_qvga_cmd: qcom,mdss_spi_coe_st7789v_qvga_cmd {
+		qcom,mdss-spi-panel-name = "zteCOE(ST7789V)IVO_320*240_2.8SPI";
+		qcom,mdss-spi-panel-destination = "display_1";
+		qcom,mdss-spi-panel-controller = <&mdss_spi>;
+		qcom,cont-splash-enabled;
+		qcom,mdss-spi-panel-framerate = <30>;
+		qcom,mdss-spi-panel-width = <240>;
+		qcom,mdss-spi-panel-height = <320>;
+		qcom,mdss-spi-h-front-porch = <66>;
+		qcom,mdss-spi-h-back-porch = <66>;
+		qcom,mdss-spi-h-pulse-width = <8>;
+		qcom,mdss-spi-v-back-porch = <1>;
+		qcom,mdss-spi-v-front-porch = <6>;
+		qcom,mdss-spi-v-pulse-width = <1>;
+		qcom,mdss-spi-h-left-border = <0>;
+		qcom,mdss-spi-h-right-border = <0>;
+		qcom,mdss-spi-v-top-border = <0>;
+		qcom,mdss-spi-v-bottom-border = <0>;
+		qcom,mdss-spi-bpp = <16>;
+		qcom,mdss-pan-physical-height-dimension = <86>;
+		qcom,mdss-pan-physical-width-dimension = <52>;
+		qcom,mdss-spi-on-command = [
+			78 01 11
+			00 02 36 00
+			00 02 3A 05
+			00 02 35 00
+			00 06 b2 0c 0c 00 33 33
+			00 02 b7 35
+			00 02 bb 38
+			00 02 c0 2c
+			00 02 c2 01
+			00 02 c3 14
+			00 02 c4 20
+			00 02 c6 0f
+			00 03 d0 a4 a1
+			00 0f E0 D0 0A 0E 0B 09 24 2A 3B 40 28 13 13 2C 32
+			00 0f E1 D0 0A 0E 0B 09 25 29 3A 3F 27 13 12 2C 32
+			00 02 53 2C
+			00 02 CC 00
+			1A 01 29
+			00 01 2C
+			];
+		qcom,mdss-spi-off-command = [
+				 1A 01 28
+				 78 01 10];
+		qcom,mdss-spi-bl-min-level = <1>;
+		qcom,mdss-spi-bl-max-level = <255>;
+		qcom,mdss-spi-bl-pmic-control-type = "bl_ctrl_dcs";
+		qcom,mdss-spi-reset-sequence = <1 20>, <0 10>, <1 120>;
+	};
+};

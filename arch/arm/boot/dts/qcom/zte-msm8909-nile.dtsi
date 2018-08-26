@@ -1,0 +1,62 @@
+&soc {
+	spi@78ba000 { /* BLSP1 QUP6 */
+		si3217x@0 {
+			compatible = "si3217x";
+			reg = <0x0>;
+			interrupt-parent = <&msm_gpio>;
+			spi-max-frequency = <960000>;
+			spi-cpha;
+			spi-cpol;
+			interrupts = <13 0x2>;
+			num_slic =  <1>;
+			rst-gpio=<&msm_gpio 12 0x0>;
+			irq-gpio=<&msm_gpio 13  0x2>;
+			power-gpio=<&msm_gpio 94 0x0>;
+			pinctrl-names = "default","sleep";
+			pinctrl-0 = <&slic_rst_active &slic_int_active>;
+			pinctrl-1 = <&slic_rst_sleep &slic_int_sleep>;
+		};
+	};
+	i2c@78b7000 { /* BLSP1 QUP3 */
+		aw9523b@5b {
+			compatible = "aw9523b";
+			reg = <0x5b>;
+			status = "ok";
+			aw9523b_mode = < 7 >;
+			zte_led,gpio_reset = <&msm_gpio 96 0>;
+		};
+	};
+};
+
+&audio_codec_mtp {
+	qcom,msm-gpios =
+		"pri_i2s",
+		"us_eu_gpio",
+		"quat_i2s";
+	qcom,pinctrl-names =
+		"all_off",
+		"pri_i2s_act",
+		"us_eu_gpio_act",
+		"pri_i2s_us_eu_gpio_act",
+		"quat_act",
+		"quat_pri_i2s_act",
+		"quat_us_eu_gpio_act",
+		"quat_us_eu_gpio_pri_i2s_act";
+	pinctrl-names =
+		"all_off",
+		"pri_i2s_act",
+		"us_eu_gpio_act",
+		"pri_i2s_us_eu_gpio_act",
+		"quat_act",
+		"quat_pri_i2s_act",
+		"quat_us_eu_gpio_act",
+		"quat_us_eu_gpio_pri_i2s_act";
+	pinctrl-0 = <&cdc_pdm_lines_sus &cross_conn_det_sus &cdc_ext_tlmm_sus>;
+	pinctrl-1 = <&cdc_pdm_lines_act &cross_conn_det_sus &cdc_ext_tlmm_sus>;
+	pinctrl-2 = <&cdc_pdm_lines_sus &cross_conn_det_act &cdc_ext_tlmm_sus>;
+	pinctrl-3 = <&cdc_pdm_lines_act &cross_conn_det_act &cdc_ext_tlmm_sus>;
+	pinctrl-4 = <&cdc_pdm_lines_sus &cross_conn_det_sus &cdc_ext_tlmm_act>;
+	pinctrl-5 = <&cdc_pdm_lines_act &cross_conn_det_sus &cdc_ext_tlmm_act>;
+	pinctrl-6 = <&cdc_pdm_lines_sus &cross_conn_det_act &cdc_ext_tlmm_act>;
+	pinctrl-7 = <&cdc_pdm_lines_act &cross_conn_det_act &cdc_ext_tlmm_act>;
+};

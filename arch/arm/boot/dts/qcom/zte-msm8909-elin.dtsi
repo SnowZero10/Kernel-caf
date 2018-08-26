@@ -1,0 +1,233 @@
+/*
+ * device tree for zte elin board
+ */
+#include "touch-key-backlight-elin.dtsi"
+#include "dsi-panel-zte-liansi-hx8394d-hsd-8p0-800p-video.dtsi"
+#include "dsi-panel-zte-lce-jd9367-lnx-8p0-800p-video.dtsi"
+
+&dsi_liansi_hx8394d_hsd_8p0_800P_video_vid {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_lce_jd9367_inx_8p0_800P_video_vid {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&mdss_dsi0 {
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_reset_active &mdss_te_active &mdss_reset_active>;
+	pinctrl-1 = <&mdss_reset_suspend &mdss_te_suspend  &mdss_reset_suspend>;
+
+	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
+	qcom,platform-bklight-en-gpio = <&msm_gpio 37 0>;
+};
+
+
+&soc {
+	msm_gpio: pinctrl@1000000 {
+		pmx_mdss_reset {
+			mdss_reset_active: mdss_reset_active {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					drive-strength = <2>; /* 2mA */
+					bias-disable = <0>; /* no pull */
+					output-high;
+				};
+			};
+
+			mdss_reset_suspend: mdss_reset_suspend {
+				mux {
+					pins = "gpio25";
+					function = "gpio";
+				};
+
+				config {
+					drive-strength = <2>; /* 2 mA */
+					bias-disable = <0>; /* no pull */
+					output-high;
+				};
+			};
+		};
+	};
+	i2c@78b5000 { /* BLSP1 QUP1 */
+		mpu6050@68 { /* Gyroscope and accelerometer sensor combo */
+			compatible = "invn,mpu6050";
+			reg = <0x68>;
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&accsensor_default>;
+			pinctrl-1 = <&accsensor_sleep>;
+			pinterrupt-parent = <&msm_gpio>;
+			interrupts = <96 0x1>;
+			vdd-supply = <&pm8909_l17>;
+			vlogic-supply = <&pm8909_l6>;
+			invn,gpio-int = <&msm_gpio 96 0x1>;
+			invn,place = "Portrait Down Back Side";
+		};
+
+		lsm6ds3@6a {
+			compatible = "st,lsm6ds3";
+			reg = <0x6a>;
+			interrupt-parent = <&msm_gpio>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			st,axis-map-x = <0>;
+			st,axis-map-y = <1>;
+			st,axis-map-z = <2>;
+			/*st,negate-x;*/
+			st,negate-y;
+			st,negate-z;
+		};
+
+		ltr559@23 {
+			compatible = "liteon,ltr559";
+			reg = <0x23>;
+			pinctrl-names = "lpsensor_default", "lpsensor_sleep";
+			pinctrl-0 = <&lpsensor_default>;
+			pinctrl-1 = <&lpsensor_sleep>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <94 0x2002>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			liteon,irq-gpio = <&msm_gpio 94 0x2002>;
+			liteon,highthr = <1500>;
+			liteon,lowthr = <1200>;
+		};
+
+		akm@c {
+			compatible = "ak,ak09911";
+			reg = <0x0c>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			akm,layout = <0x5>;
+			akm,auto-report;
+		};
+
+	};
+};
+
+&spmi_bus {
+	qcom,pm8909@0 {
+		qcom,charger {
+			status = "disabled";
+		};
+
+		/*spmi_lite is for batt present detect*/
+		spmi_lite {
+			compatible = "zte,spmi-lite";
+		};
+	};
+};
+
+&msm_gpio {
+	smb_int_pin {
+		smb_int_default: smb_int_default {
+			mux {
+				pins = "gpio58";
+				function ="gpio";
+			};
+			config {
+				pins = "gpio58";
+				drive-strength = <2>;   /* 2 MA */
+				bias-disable;
+				input-enable;
+			};
+		};
+	};
+
+	sx9310_int_active: sx9310_int_active {
+		mux {
+			pins = "gpio34";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio34";
+			drive-strength = <8>;
+			bias-disable;
+			input-enable;
+		};
+	};
+	sx9310_int_suspend: sx9310_int_suspend {
+		mux {
+			pins = "gpio34", "gpio97";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio34", "gpio97";
+			drive-strength = <8>;
+			bias-disable;
+			input-enable;
+		};
+	};
+
+};
+
+&i2c_1 {
+	sx9310-input@28 {
+		compatible = "zte, sx9310-input";
+		reg = <0x28>;
+		vdd-supply = <&pm8909_l17>;
+		svdd-supply = <&pm8909_l6>;
+		//cc,irq_gpio = <&msm_gpio 34 0x0>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <34 2>;
+		interrupt-names = "sx9310_irq";
+		pinctrl-names = "sx9310_active", "sx9310_sleep";
+		pinctrl-0 = <&sx9310_int_active>;
+		pinctrl-1 = <&sx9310_int_suspend >;
+	};
+};
+&i2c_4 {
+	ti2419x_otg_supply: ti2419x-chg@6B {
+		compatible = "zte,ti2419x-chg";
+		reg = <0x6B>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <58 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		regulator-name = "ti2419x_otg_vreg";
+
+		zte,float-voltage-mv = <4400>;
+		zte,iterm-ma = <200>;
+		/*zte,hw-iterm-disabled;*/
+		/*zte,charging-disabled; changed by zte */
+		zte,recharge-thresh-mv = <100>;
+		zte,warm_recharge-thresh-mv = <50>;
+		zte,vbatdet-max-err-mv = <20>;
+		zte,charging-timeout = <10>;
+		zte,input_voltage_mv = <3900>;
+		zte,vindpm = <1>;
+		zte,max_usb_current = <2100>;
+		zte,max_usb_current_ti25601 = <2100>;
+		zte,max_battery_current = <3000>;
+		zte,thermal-mitigation = <2100 1500 900 500 0>;
+		zte,warm_bat_mv = <4100>;
+		zte,cool_bat_mv = <4300>;
+		zte,warm-bat-decidegc = <440>;
+		zte,cool-bat-decidegc = <150>;
+		zte,hot-bat-decidegc = <500>;
+		zte,cold-bat-decidegc = <0>;
+		zte,warm_bat_chg_ma = <810>;
+		zte,cool_bat_chg_ma = <810>;
+		zte,cool_high4p0v_bat_chg_ma = <405>;
+		qcom,tichg-vadc = <&pm8909_vadc>;
+		qcom,tichg-adc_tm = <&pm8909_adc_tm>;
+		zte,batt-hot-percentage = <20>; /*Only for k81:-5~49*/
+		zte,batt-cold-percentage= <75>; /*Only for k81:-5~49*/
+	};
+
+};
+
+&sdhc_2 {
+	cd-gpios = <&msm_gpio 38 0x0>;
+
+};
+
+&audio_codec_mtp {
+	qcom,msm-spk-pa = <&msm_gpio 36 0>;
+	qcom,msm-spk-hs-switch = <&msm_gpio 0 0>;
+};

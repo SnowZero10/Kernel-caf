@@ -1,0 +1,359 @@
+#include "touch-key-backlight-emperor.dtsi"
+#include "zte-p809e15-dsi-panel-ili9881c-ski550-720p-video.dtsi"
+#include "zte-p809e15-dsi-panel-ili9881c-lcetron-720p-video.dtsi"
+
+&i2c_4 {
+	smb1360_otg_supply: smb1360-chg-fg@14 {
+		compatible = "qcom,smb1360-chg-fg";
+		reg = <0x14>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <58 8>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		qcom,empty-soc-disabled;
+		qcom,chg-inhibit-disabled;
+		qcom,float-voltage-mv = <4400>;
+		qcom,fg-cc-to-cv-mv = <4390>;
+		qcom,iterm-ma = <150>;
+		qcom,fg-ibatt-standby-ma = <200>;
+		qcom,recharge-thresh-mv = <200>;
+		qcom,thermal-mitigation = <1500 1100 800 600 0>;
+		regulator-name = "smb1360_otg_vreg";
+		qcom,thermistor-c1-coeff = <0x85EC>;
+		qcom,batt-id-disabled;
+		qcom,shdn-after-pwroff;
+		qcom,otg-batt-curr-limit = <1500>;
+		qcom,fg-delta-soc = <1>;
+		qcom,fg-auto-recharge-soc = <99>;
+		qcom,charging-timeout = <0>;
+		qcom,fg-soc-min = <15>;
+		qcom,fg-soc-max = <95>;
+		qcom,fg-iterm-ma = <200>;
+		qcom,fg-cutoff-voltage-mv = <3400>;
+		qcom,fg-voltage-empty-mv = <3300>;
+		qcom,fg-batt-capacity-mah = <3900>;
+		qcom,fg-cc-soc-coeff = <0x8033>;
+		qcom,warm-bat-decidegc = <450>;
+		qcom,cool-bat-decidegc = <100>;
+		qcom,soft-jeita-supported;
+		qcom,warm-bat-mv = <4100>;
+		qcom,cool-bat-mv = <4400>;
+		qcom,warm-bat-ma = <1350>;
+		qcom,cool-bat-ma = <1050>;
+		qcom,disable-ov-ends-chg-cycle;
+		qcom,rsense-10mhom;
+		qcom,fg-reset-at-pon;
+		qcom,fg-reset-thresold-mv = <100>;
+	};
+};
+
+&pm8909_chg {
+	status = "ok";
+	qcom,use-external-charger;
+};
+
+&pm8909_bms {
+	status = "ok";
+	qcom,disable-bms;
+};
+
+&usb_otg {
+	interrupts = <0 134 0>,<0 140 0>,<0 136 0>;
+	interrupt-names = "core_irq", "async_irq", "phy_irq";
+
+	qcom,hsusb-otg-mode = <3>;
+	vbus_otg-supply = <&smb1360_otg_supply>;
+};
+
+/ {
+	mtp_batterydata: qcom,battery-data {
+		/delete-node/qcom,palladium-batterydata;
+		#include "zte-byd-4v35-2200mah.dtsi"
+		#include "zte-bak-4v35-2200mah.dtsi"
+	};
+};
+
+&soc {
+	/*ZTE_MODIFY, add leds gpio conrol, start*/
+	gpio-modem-leds {
+		compatible = "gpio-modem-leds";
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_led_off>;
+
+		red-backlight {
+			gpios = <&msm_gpio 22 0>;
+			label = "red";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+		green-backlight {
+			gpios = <&msm_gpio 23 0>;
+			label = "green";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+		trickle-red-backlight {
+			gpios = <&msm_gpio 70 1>; /*active low*/
+			label = "trickle_red";
+			linux,default-trigger = "none";
+			retain-state-suspended;
+		};
+	};
+	msm_gpio: pinctrl@1000000 {
+		compatible = "qcom,msm8909-pinctrl";
+		reg = <0x1000000 0x300000>;
+		interrupts = <0 208 0>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		cam_sensor_mclk0_default: cam_sensor_mclk0_default {
+			mux {
+				pins = "gpio26";
+				function = "cam_mclk";
+			};
+			config {
+				pins = "gpio26";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_mclk0_sleep: cam_sensor_mclk0_sleep {
+			mux {
+				pins = "gpio26";
+				function = "cam_mclk";
+			};
+			config {
+				pins = "gpio26";
+				bias-pull-down;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_rear_default: cam_sensor_rear_default {
+			mux {
+				pins = "gpio35","gpio17","gpio71";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio35","gpio17","gpio71";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_rear_sleep: cam_sensor_rear_sleep {
+			mux {
+				pins = "gpio35","gpio17","gpio71";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio35","gpio17","gpio71";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_mclk1_default: cam_sensor_mclk1_default {
+			mux {
+				pins = "gpio27";
+				function = "cam_mclk";
+			};
+			config {
+				pins = "gpio27";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_mclk1_sleep: cam_sensor_mclk1_sleep {
+			mux {
+				pins = "gpio27";
+				function = "cam_mclk";
+			};
+			config {
+				pins = "gpio27";
+				bias-pull-down;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_front_default: cam_sensor_front_default {
+			mux {
+				pins = "gpio28","gpio65","gpio36","gpio17";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio28","gpio65","gpio36","gpio17";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_front_sleep: cam_sensor_front_sleep {
+			mux {
+				pins = "gpio28","gpio65","gpio36","gpio17";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio28","gpio65","gpio36","gpio17";
+				bias-disable;
+				drive-strength = <2>;
+			};
+		};
+		cam_sensor_flash_default: cam_sensor_flash_default {
+		/* FLASH_EN*/
+			mux {
+				pins = "gpio31";
+				function = "gpio";
+			};
+			config {
+				pins ="gpio31";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+
+		cam_sensor_flash_sleep: cam_sensor_flash_sleep {
+			 mux {
+				pins = "gpio31";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio31";
+				bias-disable; /* No PULL */
+				drive-strength = <2>; /* 2 MA */
+			};
+		};
+	};
+	/*ZTE_MODIFY, add leds gpio conrol, end*/
+	i2c@78b5000 { /* BLSP1 QUP1 */
+		bosch@18 { /* Accelerometer sensor */
+			compatible = "bosch,bma2x2";
+			reg = <0x18>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <96 0x2002>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			bosch,init-interval = <200>;
+			bosch,place = <4>;
+			bosch,gpio-int1 = <&msm_gpio 96 0x2002>;
+			bosch,gpio-int2 = <&msm_gpio 65 0x2002>;
+		};
+
+		kxtj2@e {
+			compatible = "kionix,kxtj2-1029";
+			reg = <0x0e>;
+			interrupt-parent = <&msm_gpio>;
+			/*interrupts = <96 0x2>;*/
+			vddhold-supply = <&pm8909_l17>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			kionix,min_interval = <5>;
+			kionix,poll_interval = <100>;
+			kionix,accel_direction = <6>;
+			kionix,accel_irq_use_drdy = <0>;
+			/*0 is 12BIT,	1 is 8BIT,	2 is 6BIT*/
+			kionix,accel_res = <0>;
+			/*0 is 2g,	1 is 4g,	2 is 6g,	3 is 8g*/
+			kionix,accel_g_range =	<0>;
+		};
+
+		n2dm@8 {
+			compatible = "st,n2dm";
+			reg = <0x08>;
+			interrupt-parent = <&msm_gpio>;
+			/*interrupts = <96 0x2>;*/
+			vddhold-supply = <&pm8909_l17>;
+			vdd-supply = <&pm8909_l17>;
+			vddio-supply = <&pm8909_l6>;
+			n2dm,min_interval = <1>;
+			n2dm,poll_interval = <100>;
+			n2dm,axis-map-x = <0>;
+			n2dm,axis-map-y = <1>;
+			n2dm,axis-map-z = <2>;
+			n2dm,negate-x;
+			/* n2dm,negate-y; */
+			n2dm,negate-z;
+			/*0 is 2g,	16 is 4g,	32 is 8g,	48 is 16g*/
+			n2dm,fs-range = <0>;
+		};
+
+		ltr559@23 {
+			compatible = "liteon,ltr559";
+			reg = <0x23>;
+			pinctrl-names = "lpsensor_default", "lpsensor_sleep";
+			pinctrl-0 = <&lpsensor_default>;
+			pinctrl-1 = <&lpsensor_sleep>;
+			interrupt-parent = <&msm_gpio>;
+			interrupts = <94 0x2002>;
+			vdd-supply = <&pm8909_l17>;
+			vio-supply = <&pm8909_l6>;
+			liteon,irq-gpio = <&msm_gpio 94 0x2002>;
+			liteon,highthr = <1500>;
+			liteon,lowthr = <1200>;
+		};
+	};
+};
+&msm_gpio {
+	/*ZTE_MODIFY, add leds gpio conrol, start*/
+	gpio_led_pins {
+		gpio_led_off: gpio_led_off {
+			mux {
+				pins = "gpio22", "gpio23", "gpio70";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio22", "gpio23", "gpio70";
+				drive-strength = <2>;
+				bias-disable;
+				output-low;
+			};
+		};
+	};
+	/*ZTE_MODIFY, add leds gpio conrol, end*/
+};
+&i2c_2 {
+	/delete-node/nq@28;
+};
+
+&i2c_2 {
+	pn5xx@28{
+		compatible = "nxp,pn5xx";
+		reg = <0x28>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <21 0>;
+		nxp,pn5xx-irq = <&msm_gpio 21 0x00>;
+		nxp,pn5xx-ven = <&msm_gpio 20 0x00>;
+		nxp,pn5xx-fw-dwnld = <&msm_gpio 110 0x00>;
+		//nxp,pn5xx-ese-pwr = <&tlmm 141 0x00>;
+		//nxp,pn5xx-swp2-pwr = <&tlmm129 0x00>;
+		//nxp,int_active_low = <0>;
+		nxp,pn5xx-clkreq = <&pm8909_gpios 2 0x00>;
+		nxp,clk-src = "BBCLK2";
+		interrupt-names = "nfc_irq";
+		pinctrl-names = "nfc_active","nfc_suspend";
+		pinctrl-0 = <&nfc_int_active &nfc_disable_active>;
+		pinctrl-1 = <&nfc_int_suspend &nfc_disable_suspend>;
+		clocks = <&clock_rpm clk_bb_clk2_pin>;
+		clock-names = "bb_clk2";
+	};
+};
+
+&gpio_key_active {
+	mux {
+		pins = "gpio90", "gpio91", "gpio92", "gpio95",
+		"gpio96", "gpio98";
+
+	};
+
+	config {
+		pins = "gpio90", "gpio91", "gpio92", "gpio95",
+		"gpio96", "gpio98";
+	};
+};
+
+&mdss_dsi0 {
+	zte,disp_vsp_en_gpio = <&msm_gpio 88 0>;
+	zte,disp_vsn_en_gpio = <&msm_gpio 89 0>;
+};
+
+&audio_codec_mtp {
+	qcom,msm-spk-ext-boost = <&msm_gpio 92 0>;
+};

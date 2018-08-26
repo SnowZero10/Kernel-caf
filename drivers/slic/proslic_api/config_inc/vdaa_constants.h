@@ -1,0 +1,54 @@
+/*
+** Copyright (c) 2012 Silicon Laboratories, Inc.
+** 2012-05-01 10:11:36
+**
+** Si3217x ProSLIC API Configuration Tool Version 2.11.0
+*/
+
+
+#ifndef VDAA_CONSTANTS_H
+#define VDAA_CONSTANTS_H
+
+/** Vdaa_Country Presets */
+enum {
+	COU_USA,
+	COU_GERMANY,
+	COU_CHINA,
+	COU_AUSTRALIA,
+};
+
+/** Vdaa_Audio_Gain Presets */
+enum {
+	AUDIO_GAIN_0DB,
+	AUDIO_ATTEN_4DB,
+	AUDIO_ATTEN_6DB,
+	AUDIO_ATTEN_11DB,
+};
+
+/** Vdaa_Ring_Validation Presets */
+enum {
+	RING_DET_13_5VRMS_16_5VRMS,
+	RING_DET_13_5VRMS_16_5VRMS_VALIDATION,
+	RING_DET_19_35VRMS_23_65VRMS,
+	RING_DET_19_35VRMS_23_65VRMS_VALIDATION,
+	RING_DET_40_5VRMS_49_5VRMS,
+	RING_DET_40_5VRMS_49_5VRMS_VALIDATION,
+};
+
+/** Vdaa_PCM Presets */
+enum {
+	DAA_PCM_ALAW,
+	DAA_PCM_ULAW,
+	DAA_PCM_LINEAR16,
+};
+
+/** Vdaa_Hybrid Presets */
+enum {
+	HYB_600_0_0_500FT_24AWG,
+	HYB_270_750_150_500FT_24AWG,
+	HYB_200_680_100_500FT_24AWG,
+	HYB_220_820_120_500FT_24AWG,
+};
+
+#endif
+
